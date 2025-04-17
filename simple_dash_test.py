@@ -3,26 +3,20 @@ from dash import html, dcc
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
+import os
 
-# Initialize app
 app = dash.Dash(__name__)
+server = app.server
 
-# Create a simple data frame
 df = pd.DataFrame({
     'Fruit': ['Apples', 'Oranges', 'Bananas', 'Apples', 'Oranges', 'Bananas'],
     'Amount': [4, 1, 2, 2, 4, 5],
     'City': ['SF', 'SF', 'SF', 'NYC', 'NYC', 'NYC']
 })
 
-# Server
-server = app.server
-
-# App layout - extraordinarily simple
 app.layout = html.Div([
-    # Title
     html.H1('Super Simple Test Dashboard', style={'textAlign': 'center'}),
-    
-    # Static hardcoded figure - should always render
+
     html.Div([
         html.H3('Static Test Chart'),
         dcc.Graph(
@@ -31,7 +25,7 @@ app.layout = html.Div([
                     go.Bar(
                         x=['A', 'B', 'C'],
                         y=[10, 20, 30],
-                        marker_color='rgb(255, 0, 0)'  # Pure red
+                        marker_color='rgb(255, 0, 0)'
                     )
                 ],
                 layout=go.Layout(
@@ -42,11 +36,9 @@ app.layout = html.Div([
             )
         )
     ]),
-    
-    # Spacer
+
     html.Div(style={'height': '40px'}),
-    
-    # Simple Plotly Express chart
+
     html.Div([
         html.H3('Plotly Express Chart'),
         dcc.Graph(
@@ -57,8 +49,8 @@ app.layout = html.Div([
                 color='City',
                 barmode='group',
                 color_discrete_map={
-                    'SF': 'rgb(0, 0, 255)',  # Pure blue
-                    'NYC': 'rgb(255, 165, 0)'  # Pure orange
+                    'SF': 'rgb(0, 0, 255)',
+                    'NYC': 'rgb(255, 165, 0)'
                 }
             ).update_layout(
                 plot_bgcolor='white',
@@ -68,6 +60,9 @@ app.layout = html.Div([
     ])
 ])
 
-# Run app
+# Force Replit-compatible port
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get("PORT", 3000))
+    app.run(host='0.0.0.0', port=port, debug=True)
+
+
