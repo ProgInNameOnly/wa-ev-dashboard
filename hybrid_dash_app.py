@@ -368,8 +368,37 @@ def update_tab_content(tab, n_clicks, year_range, selected_makes, selected_ev_ty
             color_discrete_sequence=[COLORS['accent'], COLORS['cambridge-blue'], '#FF5E5E']
         )
         
-        # Create layout for Overview tab
+        # Create layout for Overview tab with Key Statistics at the top
         return [
+            # Stats summary row at the top
+            dbc.Row([
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardHeader("Key Statistics"),
+                        dbc.CardBody([
+                            dbc.Row([
+                                dbc.Col([
+                                    html.Div("Total EVs", className="text-center", style={"color": COLORS['cambridge-blue']}),
+                                    html.H3(f"{len(filtered_df):,}", className="text-center")
+                                ], width=3),
+                                dbc.Col([
+                                    html.Div("Total Makes", className="text-center", style={"color": COLORS['cambridge-blue']}),
+                                    html.H3(f"{filtered_df['Make'].nunique():,}", className="text-center")
+                                ], width=3),
+                                dbc.Col([
+                                    html.Div("Total Models", className="text-center", style={"color": COLORS['cambridge-blue']}),
+                                    html.H3(f"{filtered_df['Model'].nunique():,}", className="text-center")
+                                ], width=3),
+                                dbc.Col([
+                                    html.Div("Counties", className="text-center", style={"color": COLORS['cambridge-blue']}),
+                                    html.H3(f"{filtered_df['County'].nunique():,}", className="text-center")
+                                ], width=3),
+                            ])
+                        ])
+                    ])
+                ], width=12)
+            ], className="mb-4"),
+            
             dbc.Row([
                 dbc.Col([
                     dbc.Card([
@@ -409,35 +438,6 @@ def update_tab_content(tab, n_clicks, year_range, selected_makes, selected_ev_ty
                     ])
                 ], width=6)
             ]),
-            
-            # Stats summary row
-            dbc.Row([
-                dbc.Col([
-                    dbc.Card([
-                        dbc.CardHeader("Key Statistics"),
-                        dbc.CardBody([
-                            dbc.Row([
-                                dbc.Col([
-                                    html.Div("Total EVs", className="text-center", style={"color": COLORS['cambridge-blue']}),
-                                    html.H3(f"{len(filtered_df):,}", className="text-center")
-                                ], width=3),
-                                dbc.Col([
-                                    html.Div("Total Makes", className="text-center", style={"color": COLORS['cambridge-blue']}),
-                                    html.H3(f"{filtered_df['Make'].nunique():,}", className="text-center")
-                                ], width=3),
-                                dbc.Col([
-                                    html.Div("Total Models", className="text-center", style={"color": COLORS['cambridge-blue']}),
-                                    html.H3(f"{filtered_df['Model'].nunique():,}", className="text-center")
-                                ], width=3),
-                                dbc.Col([
-                                    html.Div("Counties", className="text-center", style={"color": COLORS['cambridge-blue']}),
-                                    html.H3(f"{filtered_df['County'].nunique():,}", className="text-center")
-                                ], width=3),
-                            ])
-                        ])
-                    ])
-                ], width=12)
-            ], className="mt-4"),
         ]
     
     # Geographical Analysis Tab
