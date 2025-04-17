@@ -21,6 +21,28 @@ def preprocess_data(df):
         df['Base MSRP'] = pd.to_numeric(df['Base MSRP'], errors='coerce')
         df['Base MSRP'] = df['Base MSRP'].fillna(0)
     
+    # Make sure the County column is all strings
+    if 'County' in df.columns:
+        df['County'] = df['County'].astype(str)
+    
+    # Make sure Make and Model columns are strings
+    if 'Make' in df.columns:
+        df['Make'] = df['Make'].astype(str)
+    
+    if 'Model' in df.columns:
+        df['Model'] = df['Model'].astype(str)
+    
+    # Ensure Electric Vehicle Type is a string
+    if 'Electric Vehicle Type' in df.columns:
+        df['Electric Vehicle Type'] = df['Electric Vehicle Type'].astype(str)
+    
+    # Ensure CAFV Eligibility is a string
+    if 'Clean Alternative Fuel Vehicle (CAFV) Eligibility' in df.columns:
+        df['Clean Alternative Fuel Vehicle (CAFV) Eligibility'] = df['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].astype(str)
+        
+    # Replace 'nan' strings with a more descriptive label
+    df.replace('nan', 'Unknown', inplace=True)
+    
     # Process Vehicle Location if it exists
     if 'Vehicle Location' in df.columns:
         df = process_location_column(df)
