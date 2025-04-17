@@ -378,97 +378,228 @@ def update_dashboard(year_range, selected_makes, selected_ev_types, selected_cou
     metric_range = create_metric_card("Average Electric Range (miles)", f"{avg_range}")
     
     # Create figures for Tab 1: Overview
-    # Top 10 makes bar chart
-    make_counts = filtered_df['Make'].value_counts().reset_index()
-    make_counts.columns = ['Make', 'Count']
-    make_counts = make_counts.head(10)
-    fig_makes = viz.create_make_distribution_chart(make_counts)
-    
-    # Top models by popularity
-    model_counts = filtered_df.groupby(['Make', 'Model']).size().reset_index(name='Count')
-    model_counts = model_counts.sort_values('Count', ascending=False).head(10)
-    fig_models = viz.create_model_distribution_chart(model_counts)
-    
-    # Electric Range Distribution
-    range_df = filtered_df[filtered_df['Electric Range'] > 0]
-    fig_range = viz.create_range_distribution_chart(range_df)
+    try:
+        # Top 10 makes bar chart
+        make_counts = filtered_df['Make'].value_counts().reset_index()
+        make_counts.columns = ['Make', 'Count']
+        make_counts = make_counts.head(10)
+        fig_makes = viz.create_make_distribution_chart(make_counts)
+        
+        # Top models by popularity
+        model_counts = filtered_df.groupby(['Make', 'Model']).size().reset_index(name='Count')
+        model_counts = model_counts.sort_values('Count', ascending=False).head(10)
+        fig_models = viz.create_model_distribution_chart(model_counts)
+        
+        # Electric Range Distribution
+        range_df = filtered_df[filtered_df['Electric Range'] > 0]
+        fig_range = viz.create_range_distribution_chart(range_df)
+    except Exception as e:
+        print(f"Error generating overview charts: {e}")
+        # Create fallback figures if visualization fails
+        fig_makes = go.Figure()
+        fig_makes.update_layout(
+            title="Error rendering make distribution chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
+        )
+        fig_models = go.Figure()
+        fig_models.update_layout(
+            title="Error rendering model distribution chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
+        )
+        fig_range = go.Figure()
+        fig_range.update_layout(
+            title="Error rendering range distribution chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
+        )
     
     # Tab 2: Geographical Analysis
-    # County distribution
-    county_counts = filtered_df['County'].value_counts().reset_index()
-    county_counts.columns = ['County', 'Count']
-    fig_counties = viz.create_county_distribution_chart(county_counts)
-    
-    # Map visualization
-    map_data = dp.process_location_data(filtered_df)
-    if not map_data.empty:
-        fig_map = viz.create_location_map(map_data)
-    else:
+    try:
+        # County distribution
+        county_counts = filtered_df['County'].value_counts().reset_index()
+        county_counts.columns = ['County', 'Count']
+        fig_counties = viz.create_county_distribution_chart(county_counts)
+        
+        # Map visualization
+        map_data = dp.process_location_data(filtered_df)
+        if not map_data.empty:
+            fig_map = viz.create_location_map(map_data)
+        else:
+            fig_map = go.Figure()
+            fig_map.update_layout(
+                title="No valid location data available for mapping",
+                height=500,
+                paper_bgcolor=colors['background'],
+                plot_bgcolor=colors['card'],
+                font_color=colors['text']
+            )
+        
+        # Electric Utility Distribution
+        utility_data = dp.process_utility_data(filtered_df)
+        fig_utilities = viz.create_utility_distribution_chart(utility_data)
+    except Exception as e:
+        print(f"Error generating geographical charts: {e}")
+        # Create fallback figures if visualization fails
+        fig_counties = go.Figure()
+        fig_counties.update_layout(
+            title="Error rendering county distribution chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
+        )
         fig_map = go.Figure()
         fig_map.update_layout(
-            title="No valid location data available for mapping",
-            height=500
+            title="Error rendering location map",
+            height=500,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
         )
-    
-    # Electric Utility Distribution
-    utility_data = dp.process_utility_data(filtered_df)
-    fig_utilities = viz.create_utility_distribution_chart(utility_data)
+        fig_utilities = go.Figure()
+        fig_utilities.update_layout(
+            title="Error rendering utility distribution chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
+        )
     
     # Tab 3: Manufacturer Analysis
-    # Select top manufacturers for comparison
-    top_makes = filtered_df['Make'].value_counts().head(8).index.tolist()
-    
-    # Electric range by manufacturer
-    range_comp_df = filtered_df[(filtered_df['Make'].isin(top_makes)) & (filtered_df['Electric Range'] > 0)]
-    if not range_comp_df.empty:
-        fig_range_by_make = viz.create_range_by_make_chart(range_comp_df)
-    else:
+    try:
+        # Select top manufacturers for comparison
+        top_makes = filtered_df['Make'].value_counts().head(8).index.tolist()
+        
+        # Electric range by manufacturer
+        range_comp_df = filtered_df[(filtered_df['Make'].isin(top_makes)) & (filtered_df['Electric Range'] > 0)]
+        if not range_comp_df.empty:
+            fig_range_by_make = viz.create_range_by_make_chart(range_comp_df)
+        else:
+            fig_range_by_make = go.Figure()
+            fig_range_by_make.update_layout(
+                title="Not enough data available for range comparison",
+                height=500,
+                paper_bgcolor=colors['background'],
+                plot_bgcolor=colors['card'],
+                font_color=colors['text']
+            )
+        
+        # EV Type Distribution by Manufacturer
+        type_by_make = filtered_df[filtered_df['Make'].isin(top_makes)].groupby(['Make', 'Electric Vehicle Type']).size().reset_index(name='Count')
+        fig_type_by_make = viz.create_ev_type_by_make_chart(type_by_make)
+        
+        # Create options for manufacturer selector
+        mfr_options = [{'label': make, 'value': make} for make in top_makes]
+        
+        # If no manufacturer is selected, use the first one from the list
+        if not selected_mfr and top_makes:
+            selected_mfr = top_makes[0]
+            
+        # Model distribution by manufacturer
+        if selected_mfr:
+            mfr_models = filtered_df[filtered_df['Make'] == selected_mfr]['Model'].value_counts().reset_index()
+            mfr_models.columns = ['Model', 'Count']
+            fig_mfr_models = viz.create_manufacturer_models_chart(mfr_models, selected_mfr)
+        else:
+            fig_mfr_models = go.Figure()
+            fig_mfr_models.update_layout(
+                title="Please select a manufacturer",
+                height=500,
+                paper_bgcolor=colors['background'],
+                plot_bgcolor=colors['card'],
+                font_color=colors['text']
+            )
+    except Exception as e:
+        print(f"Error generating manufacturer charts: {e}")
+        # Create fallback figures
         fig_range_by_make = go.Figure()
         fig_range_by_make.update_layout(
-            title="Not enough data available for range comparison",
-            height=500
+            title="Error rendering range by make chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
         )
-    
-    # EV Type Distribution by Manufacturer
-    type_by_make = filtered_df[filtered_df['Make'].isin(top_makes)].groupby(['Make', 'Electric Vehicle Type']).size().reset_index(name='Count')
-    fig_type_by_make = viz.create_ev_type_by_make_chart(type_by_make)
-    
-    # Create options for manufacturer selector
-    mfr_options = [{'label': make, 'value': make} for make in top_makes]
-    
-    # If no manufacturer is selected, use the first one from the list
-    if not selected_mfr and top_makes:
-        selected_mfr = top_makes[0]
-        
-    # Model distribution by manufacturer
-    if selected_mfr:
-        mfr_models = filtered_df[filtered_df['Make'] == selected_mfr]['Model'].value_counts().reset_index()
-        mfr_models.columns = ['Model', 'Count']
-        fig_mfr_models = viz.create_manufacturer_models_chart(mfr_models, selected_mfr)
-    else:
+        fig_type_by_make = go.Figure()
+        fig_type_by_make.update_layout(
+            title="Error rendering EV type distribution chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
+        )
         fig_mfr_models = go.Figure()
         fig_mfr_models.update_layout(
-            title="Please select a manufacturer",
-            height=500
+            title="Error rendering manufacturer models chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
         )
+        mfr_options = []
+        selected_mfr = None
     
     # Tab 4: Time Trends Analysis
-    # EV adoption over time
-    year_counts = filtered_df.groupby('Model Year').size().reset_index(name='Count')
-    fig_trend = viz.create_adoption_trend_chart(year_counts)
-    
-    # EV type adoption over time
-    type_year_counts = filtered_df.groupby(['Model Year', 'Electric Vehicle Type']).size().reset_index(name='Count')
-    fig_type_trend = viz.create_ev_type_trend_chart(type_year_counts)
-    
-    # Manufacturer adoption over time
-    top5_makes = filtered_df['Make'].value_counts().head(5).index.tolist()
-    make_year_counts = filtered_df[filtered_df['Make'].isin(top5_makes)].groupby(['Model Year', 'Make']).size().reset_index(name='Count')
-    fig_make_trend = viz.create_manufacturer_trend_chart(make_year_counts)
-    
-    # CAFV eligibility over time
-    cafv_year_counts = filtered_df.groupby(['Model Year', 'Clean Alternative Fuel Vehicle (CAFV) Eligibility']).size().reset_index(name='Count')
-    fig_cafv_trend = viz.create_cafv_trend_chart(cafv_year_counts)
+    try:
+        # EV adoption over time
+        year_counts = filtered_df.groupby('Model Year').size().reset_index(name='Count')
+        fig_trend = viz.create_adoption_trend_chart(year_counts)
+        
+        # EV type adoption over time
+        type_year_counts = filtered_df.groupby(['Model Year', 'Electric Vehicle Type']).size().reset_index(name='Count')
+        fig_type_trend = viz.create_ev_type_trend_chart(type_year_counts)
+        
+        # Manufacturer adoption over time
+        top5_makes = filtered_df['Make'].value_counts().head(5).index.tolist()
+        make_year_counts = filtered_df[filtered_df['Make'].isin(top5_makes)].groupby(['Model Year', 'Make']).size().reset_index(name='Count')
+        fig_make_trend = viz.create_manufacturer_trend_chart(make_year_counts)
+        
+        # CAFV eligibility over time
+        cafv_year_counts = filtered_df.groupby(['Model Year', 'Clean Alternative Fuel Vehicle (CAFV) Eligibility']).size().reset_index(name='Count')
+        fig_cafv_trend = viz.create_cafv_trend_chart(cafv_year_counts)
+    except Exception as e:
+        print(f"Error generating time trend charts: {e}")
+        # Create fallback figures
+        fig_trend = go.Figure()
+        fig_trend.update_layout(
+            title="Error rendering adoption trend chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
+        )
+        fig_type_trend = go.Figure()
+        fig_type_trend.update_layout(
+            title="Error rendering EV type trend chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
+        )
+        fig_make_trend = go.Figure()
+        fig_make_trend.update_layout(
+            title="Error rendering manufacturer trend chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
+        )
+        fig_cafv_trend = go.Figure()
+        fig_cafv_trend.update_layout(
+            title="Error rendering CAFV eligibility trend chart",
+            height=400,
+            paper_bgcolor=colors['background'],
+            plot_bgcolor=colors['card'],
+            font_color=colors['text']
+        )
     
     return [
         filtered_count, 
