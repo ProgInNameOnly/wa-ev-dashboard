@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
+    "dash>=3.0.3",
+    "dash-bootstrap-components>=2.0.1",
     "numpy>=2.2.4",
     "pandas>=2.2.3",
     "plotly>=6.0.1",
