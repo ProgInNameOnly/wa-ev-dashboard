@@ -10,16 +10,18 @@ colors = {
     'text': '#8ab0ab',        # cambridge-blue
     'accent': '#3e505b',      # charcoal
     'card': '#1a1d1a',        # eerie-black
-    'dark_accent': '#26413c'  # dark-slate-gray
+    'dark_accent': '#26413c', # dark-slate-gray
+    'highlight': '#65a6a0',   # brighter version of cambridge-blue
+    'bright_accent': '#5a6f7d' # brighter version of charcoal
 }
 
-# Custom colorscale based on theme
+# Custom colorscale based on theme - brighter colors for better visibility
 custom_colorscale = [
-    [0, colors['background']],
-    [0.25, colors['dark_accent']],
-    [0.5, colors['accent']],
-    [0.75, colors['text']],
-    [1, '#ffffff']
+    [0, '#2a6056'],       # darker teal
+    [0.25, '#3d8a7d'],    # medium teal
+    [0.5, '#65a6a0'],     # brighter cambridge-blue
+    [0.75, '#a7ccc7'],    # light teal
+    [1, '#d5e8e5']        # very light teal
 ]
 
 def apply_theme(fig):
@@ -30,37 +32,41 @@ def apply_theme(fig):
         font_color=colors['text'],
         font_family='Courier New, monospace',
         margin=dict(l=10, r=10, t=30, b=10),
+        # Increase contrast for better visibility
+        title_font=dict(color=colors['highlight'], size=18),
     )
     
-    # Update axes
+    # Update axes with brighter colors for better visibility
     fig.update_xaxes(
         showgrid=True,
         gridwidth=1,
-        gridcolor=colors['accent'],
+        gridcolor=colors['bright_accent'],
         zeroline=False,
         showline=True,
-        linewidth=1,
-        linecolor=colors['text'],
-        title_font=dict(color=colors['text'])
+        linewidth=2,
+        linecolor=colors['highlight'],
+        title_font=dict(color=colors['highlight'], size=14),
+        tickfont=dict(color=colors['highlight'])
     )
     
     fig.update_yaxes(
         showgrid=True,
         gridwidth=1,
-        gridcolor=colors['accent'],
+        gridcolor=colors['bright_accent'],
         zeroline=False,
         showline=True,
-        linewidth=1,
-        linecolor=colors['text'],
-        title_font=dict(color=colors['text'])
+        linewidth=2,
+        linecolor=colors['highlight'],
+        title_font=dict(color=colors['highlight'], size=14),
+        tickfont=dict(color=colors['highlight'])
     )
     
-    # Update legend
+    # Update legend with better contrast
     fig.update_layout(
         legend=dict(
-            font=dict(color=colors['text']),
+            font=dict(color=colors['highlight']),
             bgcolor=colors['card'],
-            bordercolor=colors['accent'],
+            bordercolor=colors['highlight'],
             borderwidth=1
         )
     )
@@ -84,8 +90,25 @@ def create_make_distribution_chart(make_counts):
     
     fig.update_traces(
         hovertemplate='<b>%{y}</b><br>Number of Vehicles: %{x:,}',
-        marker_line_color=colors['accent'],
-        marker_line_width=1
+        marker_line_color=colors['background'],
+        marker_line_width=1,
+        texttemplate='%{x:,}',  # Add text labels
+        textposition='outside',
+        textfont=dict(
+            size=14,
+            color=colors['highlight']
+        )
+    )
+    
+    # Add more explicit axis labels
+    fig.update_layout(
+        xaxis_title='Number of Vehicles',
+        yaxis_title='Manufacturer',
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        )
     )
     
     return apply_theme(fig)
@@ -97,6 +120,9 @@ def create_model_distribution_chart(model_counts):
     # Create a column combining make and model
     model_counts['Full Model'] = model_counts['Make'] + ' ' + model_counts['Model']
     
+    # Use a brighter color sequence for better visibility
+    manufacturer_colors = ['#65a6a0', '#a7ccc7', '#d5e8e5', '#3d8a7d', '#2a6056', '#5a6f7d', '#7a8f9d', '#9aafbd']
+    
     fig = px.bar(
         model_counts,
         x='Count',
@@ -105,13 +131,37 @@ def create_model_distribution_chart(model_counts):
         color='Make',
         labels={'Count': 'Number of Vehicles', 'Full Model': 'Vehicle Model'},
         title='Top 10 EV Models by Popularity',
-        color_discrete_sequence=px.colors.sequential.Viridis
+        color_discrete_sequence=manufacturer_colors
     )
     
     fig.update_traces(
         hovertemplate='<b>%{y}</b><br>Number of Vehicles: %{x:,}',
-        marker_line_color=colors['accent'],
-        marker_line_width=1
+        marker_line_color=colors['background'],
+        marker_line_width=1,
+        texttemplate='%{x:,}',  # Add text labels
+        textposition='outside',
+        textfont=dict(
+            size=14,
+            color=colors['highlight']
+        )
+    )
+    
+    # Add more explicit axis labels
+    fig.update_layout(
+        xaxis_title='Number of Vehicles',
+        yaxis_title='Vehicle Model',
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        ),
+        # Enhanced legend for better visibility
+        legend=dict(
+            font=dict(color=colors['highlight'], size=14),
+            bgcolor=colors['card'],
+            bordercolor=colors['highlight'],
+            borderwidth=2
+        )
     )
     
     return apply_theme(fig)
@@ -120,6 +170,9 @@ def create_range_distribution_chart(range_df):
     """
     Create a histogram of electric range distribution
     """
+    # Use brighter colors for better visibility
+    ev_type_colors = ['#65a6a0', '#a7ccc7']
+    
     fig = px.histogram(
         range_df,
         x='Electric Range',
@@ -129,7 +182,7 @@ def create_range_distribution_chart(range_df):
         barmode='overlay',
         labels={'Electric Range': 'Electric Range (miles)'},
         title='Distribution of Electric Range',
-        color_discrete_sequence=[colors['text'], colors['accent']]
+        color_discrete_sequence=ev_type_colors
     )
     
     fig.update_traces(
@@ -138,15 +191,35 @@ def create_range_distribution_chart(range_df):
         marker_line_width=1
     )
     
-    # Add vertical line for average range
+    # Add vertical line for average range with improved visibility
     avg_range = range_df['Electric Range'].mean()
     fig.add_vline(
         x=avg_range,
         line_dash="dash",
-        line_color=colors['text'],
+        line_color=colors['highlight'],
+        line_width=2,
         annotation_text=f"Avg: {avg_range:.1f} miles",
         annotation_position="top right",
-        annotation_font_color=colors['text']
+        annotation_font_color=colors['highlight'],
+        annotation_font_size=14
+    )
+    
+    # Add more explicit axis labels
+    fig.update_layout(
+        xaxis_title='Electric Range (miles)',
+        yaxis_title='Number of Vehicles',
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        ),
+        # Enhanced legend for better visibility
+        legend=dict(
+            font=dict(color=colors['highlight'], size=14),
+            bgcolor=colors['card'],
+            bordercolor=colors['highlight'],
+            borderwidth=2
+        )
     )
     
     return apply_theme(fig)
@@ -170,11 +243,27 @@ def create_county_distribution_chart(county_counts):
     
     fig.update_traces(
         hovertemplate='<b>%{x}</b><br>Number of Vehicles: %{y:,}',
-        marker_line_color=colors['accent'],
-        marker_line_width=1
+        marker_line_color=colors['background'],
+        marker_line_width=1,
+        texttemplate='%{y:,}',  # Add text labels
+        textposition='outside',
+        textfont=dict(
+            size=14,
+            color=colors['highlight']
+        )
     )
     
-    fig.update_layout(xaxis_tickangle=-45)
+    # Add more explicit axis labels
+    fig.update_layout(
+        xaxis_title='County',
+        yaxis_title='Number of Vehicles',
+        xaxis_tickangle=-45,
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        )
+    )
     
     return apply_theme(fig)
 
@@ -182,6 +271,9 @@ def create_location_map(map_data):
     """
     Create a scatter map of EV locations
     """
+    # Use brighter colors for better visibility
+    ev_type_colors = ['#65a6a0', '#a7ccc7', '#d5e8e5']
+    
     fig = px.scatter_mapbox(
         map_data,
         lat='Latitude',
@@ -197,18 +289,28 @@ def create_location_map(map_data):
         },
         zoom=6,
         title='EV Locations in Washington State',
-        color_discrete_sequence=px.colors.sequential.Viridis
+        color_discrete_sequence=ev_type_colors,
+        opacity=0.8  # Slightly transparent points for better overlap visibility
     )
     
     fig.update_layout(
         mapbox_style="carto-darkmatter",
         mapbox_accesstoken=None,
         legend=dict(
+            font=dict(color=colors['highlight'], size=14),
+            bgcolor=colors['card'],
+            bordercolor=colors['highlight'],
+            borderwidth=2,
             orientation="h",
             yanchor="bottom",
             y=1.02,
             xanchor="right",
             x=1
+        ),
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
         )
     )
     
@@ -218,19 +320,39 @@ def create_utility_distribution_chart(utility_data):
     """
     Create a pie chart of EV distribution by electric utility
     """
+    # Use brighter, more distinct colors for pie slices
+    utility_colors = ['#65a6a0', '#3d8a7d', '#a7ccc7', '#d5e8e5', '#2a6056', 
+                      '#5a6f7d', '#7a8f9d', '#9aafbd', '#bacfdd', '#cedff9']
+    
     fig = px.pie(
         utility_data,
         values='Count',
         names='Utility',
         title='EV Distribution by Electric Utility',
-        color_discrete_sequence=px.colors.sequential.Viridis
+        color_discrete_sequence=utility_colors
     )
     
     fig.update_traces(
         textposition='inside',
         textinfo='percent+label',
+        textfont=dict(size=14, color=colors['background']),
         marker=dict(line=dict(color=colors['background'], width=2)),
         hovertemplate='<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}'
+    )
+    
+    # Enhanced legend for better visibility
+    fig.update_layout(
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        ),
+        legend=dict(
+            font=dict(color=colors['highlight'], size=14),
+            bgcolor=colors['card'],
+            bordercolor=colors['highlight'],
+            borderwidth=2
+        )
     )
     
     return apply_theme(fig)
@@ -239,6 +361,10 @@ def create_range_by_make_chart(range_df):
     """
     Create a box plot of electric range by manufacturer
     """
+    # Use brighter colors for better visibility
+    manufacturer_colors = ['#65a6a0', '#a7ccc7', '#d5e8e5', '#3d8a7d', '#2a6056', 
+                           '#5a6f7d', '#7a8f9d', '#9aafbd']
+    
     fig = px.box(
         range_df,
         x='Make',
@@ -247,16 +373,38 @@ def create_range_by_make_chart(range_df):
         points='outliers',
         labels={'Electric Range': 'Electric Range (miles)'},
         title='Electric Range Distribution by Manufacturer',
-        color_discrete_sequence=px.colors.sequential.Viridis
+        color_discrete_sequence=manufacturer_colors
     )
     
     fig.update_traces(
         marker_line_color=colors['background'],
         marker_line_width=1,
-        boxmean=True  # Show mean as a dashed line
+        boxmean=True,  # Show mean as a dashed line
+        marker=dict(
+            opacity=0.8,
+            size=6,
+            line=dict(width=1, color=colors['background'])
+        )
     )
     
-    fig.update_layout(xaxis_tickangle=-45)
+    # Add more explicit axis labels
+    fig.update_layout(
+        xaxis_title='Manufacturer',
+        yaxis_title='Electric Range (miles)',
+        xaxis_tickangle=-45,
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        ),
+        # Enhanced legend for better visibility
+        legend=dict(
+            font=dict(color=colors['highlight'], size=14),
+            bgcolor=colors['card'],
+            bordercolor=colors['highlight'],
+            borderwidth=2
+        )
+    )
     
     return apply_theme(fig)
 
@@ -264,23 +412,50 @@ def create_ev_type_by_make_chart(type_by_make):
     """
     Create a stacked bar chart of EV types by manufacturer
     """
+    # Use brighter colors for better visibility
+    ev_type_colors = ['#65a6a0', '#a7ccc7', '#d5e8e5']
+    
     fig = px.bar(
         type_by_make,
         x='Make',
         y='Count',
         color='Electric Vehicle Type',
         barmode='stack',
-        labels={'Count': 'Number of Vehicles'},
+        labels={'Count': 'Number of Vehicles', 'Make': 'Manufacturer'},
         title='EV Type Distribution by Manufacturer',
-        color_discrete_sequence=px.colors.sequential.Viridis
+        color_discrete_sequence=ev_type_colors
     )
     
     fig.update_traces(
         marker_line_color=colors['background'],
-        marker_line_width=1
+        marker_line_width=1,
+        # Add text labels showing values
+        texttemplate='%{y:,}',  
+        textposition='inside',
+        textfont=dict(
+            size=14,
+            color=colors['background']
+        )
     )
     
-    fig.update_layout(xaxis_tickangle=-45)
+    # Add more explicit axis labels
+    fig.update_layout(
+        xaxis_title='Manufacturer',
+        yaxis_title='Number of Vehicles',
+        xaxis_tickangle=-45,
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        ),
+        # Enhanced legend for better visibility
+        legend=dict(
+            font=dict(color=colors['highlight'], size=14),
+            bgcolor=colors['card'],
+            bordercolor=colors['highlight'],
+            borderwidth=2
+        )
+    )
     
     return apply_theme(fig)
 
@@ -303,11 +478,27 @@ def create_manufacturer_models_chart(model_data, manufacturer):
     
     fig.update_traces(
         hovertemplate='<b>%{x}</b><br>Number of Vehicles: %{y:,}',
-        marker_line_color=colors['accent'],
-        marker_line_width=1
+        marker_line_color=colors['background'],
+        marker_line_width=1,
+        texttemplate='%{y:,}',  # Add text labels
+        textposition='outside',
+        textfont=dict(
+            size=14,
+            color=colors['highlight']
+        )
     )
     
-    fig.update_layout(xaxis_tickangle=-45)
+    # Add more explicit axis labels
+    fig.update_layout(
+        xaxis_title='Model',
+        yaxis_title='Number of Vehicles',
+        xaxis_tickangle=-45,
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        )
+    )
     
     return apply_theme(fig)
 
@@ -324,12 +515,25 @@ def create_adoption_trend_chart(year_counts):
         title='EV Adoption Trend by Model Year'
     )
     
+    # Use much brighter colors for line visibility
     fig.update_traces(
-        line_color=colors['text'],
-        marker_color=colors['accent'],
+        line_color=colors['highlight'],
+        line_width=4,
+        marker_color='#a7ccc7',  # Light teal
         marker_line_color=colors['background'],
         marker_line_width=1,
-        marker_size=8
+        marker_size=12
+    )
+    
+    # Add more explicit axis labels
+    fig.update_layout(
+        xaxis_title='Model Year',
+        yaxis_title='Number of Vehicles',
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        )
     )
     
     return apply_theme(fig)
@@ -338,6 +542,9 @@ def create_ev_type_trend_chart(type_year_counts):
     """
     Create a line chart of EV type adoption over time
     """
+    # Use a brighter color sequence for better visibility
+    bright_colors = ['#65a6a0', '#a7ccc7', '#d5e8e5', '#3d8a7d', '#2a6056']
+    
     fig = px.line(
         type_year_counts,
         x='Model Year',
@@ -346,13 +553,32 @@ def create_ev_type_trend_chart(type_year_counts):
         markers=True,
         labels={'Count': 'Number of Vehicles', 'Model Year': 'Year'},
         title='EV Type Adoption Trend by Year',
-        color_discrete_sequence=px.colors.sequential.Viridis
+        color_discrete_sequence=bright_colors
     )
     
     fig.update_traces(
+        line_width=3,
         marker_line_color=colors['background'],
         marker_line_width=1,
-        marker_size=8
+        marker_size=10
+    )
+    
+    # Add more explicit axis labels
+    fig.update_layout(
+        xaxis_title='Model Year',
+        yaxis_title='Number of Vehicles',
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        ),
+        # Enhanced legend for better visibility
+        legend=dict(
+            font=dict(color=colors['highlight'], size=14),
+            bgcolor=colors['card'],
+            bordercolor=colors['highlight'],
+            borderwidth=2
+        )
     )
     
     return apply_theme(fig)
@@ -361,6 +587,9 @@ def create_manufacturer_trend_chart(make_year_counts):
     """
     Create a line chart of manufacturer adoption over time
     """
+    # Define bright custom colors for manufacturers
+    manufacturer_colors = ['#65a6a0', '#a7ccc7', '#3d8a7d', '#2a6056', '#5a6f7d']
+    
     fig = px.line(
         make_year_counts,
         x='Model Year',
@@ -369,13 +598,32 @@ def create_manufacturer_trend_chart(make_year_counts):
         markers=True,
         labels={'Count': 'Number of Vehicles', 'Model Year': 'Year'},
         title='Top 5 Manufacturers Adoption Trend',
-        color_discrete_sequence=px.colors.sequential.Viridis
+        color_discrete_sequence=manufacturer_colors
     )
     
     fig.update_traces(
+        line_width=3,
         marker_line_color=colors['background'],
         marker_line_width=1,
-        marker_size=8
+        marker_size=10
+    )
+    
+    # Add more explicit axis labels
+    fig.update_layout(
+        xaxis_title='Model Year',
+        yaxis_title='Number of Vehicles',
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        ),
+        # Enhanced legend for better visibility
+        legend=dict(
+            font=dict(color=colors['highlight'], size=14),
+            bgcolor=colors['card'],
+            bordercolor=colors['highlight'],
+            borderwidth=2
+        )
     )
     
     return apply_theme(fig)
@@ -384,6 +632,9 @@ def create_cafv_trend_chart(cafv_year_counts):
     """
     Create a stacked area chart of CAFV eligibility over time
     """
+    # Brighter colors for better visibility on dark background
+    cafv_colors = ['#65a6a0', '#3d8a7d', '#a7ccc7', '#2a6056']
+    
     fig = px.area(
         cafv_year_counts,
         x='Model Year',
@@ -391,12 +642,31 @@ def create_cafv_trend_chart(cafv_year_counts):
         color='Clean Alternative Fuel Vehicle (CAFV) Eligibility',
         labels={'Count': 'Number of Vehicles', 'Model Year': 'Year'},
         title='CAFV Eligibility Trend by Year',
-        color_discrete_sequence=px.colors.sequential.Viridis
+        color_discrete_sequence=cafv_colors
     )
     
     fig.update_traces(
         marker_line_color=colors['background'],
-        marker_line_width=0.5
+        marker_line_width=1,
+        opacity=0.8  # Increased opacity for better visibility
+    )
+    
+    # Add more explicit axis labels
+    fig.update_layout(
+        xaxis_title='Model Year',
+        yaxis_title='Number of Vehicles',
+        hoverlabel=dict(
+            bgcolor=colors['background'],
+            font_size=14,
+            font_color=colors['highlight']
+        ),
+        # Enhanced legend for better visibility
+        legend=dict(
+            font=dict(color=colors['highlight'], size=14),
+            bgcolor=colors['card'],
+            bordercolor=colors['highlight'],
+            borderwidth=2
+        )
     )
     
     return apply_theme(fig)
