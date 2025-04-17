@@ -12,16 +12,19 @@ colors = {
     'card': '#1a1d1a',        # eerie-black
     'dark_accent': '#26413c', # dark-slate-gray
     'highlight': '#65a6a0',   # brighter version of cambridge-blue
-    'bright_accent': '#5a6f7d' # brighter version of charcoal
+    'bright_accent': '#5a6f7d', # brighter version of charcoal
+    'bar_color': '#00FFB0',   # bright neon turquoise - highly visible
+    'accent_bar': '#FF5E5E',  # bright coral red
+    'third_color': '#FFD166'  # bright amber
 }
 
-# Custom colorscale based on theme - brighter colors for better visibility
+# Fixed bright colorscale that will definitely be visible
 custom_colorscale = [
-    [0, '#2a6056'],       # darker teal
-    [0.25, '#3d8a7d'],    # medium teal
-    [0.5, '#65a6a0'],     # brighter cambridge-blue
-    [0.75, '#a7ccc7'],    # light teal
-    [1, '#d5e8e5']        # very light teal
+    [0, '#FF5E5E'],       # bright coral red
+    [0.25, '#FFD166'],    # bright amber
+    [0.5, '#06D6A0'],     # bright mint
+    [0.75, '#118AB2'],    # bright cerulean
+    [1, '#073B4C']        # dark blue
 ]
 
 def apply_theme(fig):
@@ -88,11 +91,15 @@ def create_make_distribution_chart(make_counts):
         title='Top 10 EV Manufacturers'
     )
     
+    # Override the colors to ensure they're visible - CRITICAL CHANGE
     fig.update_traces(
+        marker=dict(
+            color=colors['bar_color'],  # Use bright neon turquoise
+            opacity=1.0,                # Full opacity
+            line=dict(width=1, color=colors['background'])
+        ),
         hovertemplate='<b>%{y}</b><br>Number of Vehicles: %{x:,}',
-        marker_line_color=colors['background'],
-        marker_line_width=1,
-        texttemplate='%{x:,}',  # Add text labels
+        texttemplate='%{x:,}',          # Add text labels
         textposition='outside',
         textfont=dict(
             size=14,
@@ -120,8 +127,8 @@ def create_model_distribution_chart(model_counts):
     # Create a column combining make and model
     model_counts['Full Model'] = model_counts['Make'] + ' ' + model_counts['Model']
     
-    # Use a brighter color sequence for better visibility
-    manufacturer_colors = ['#65a6a0', '#a7ccc7', '#d5e8e5', '#3d8a7d', '#2a6056', '#5a6f7d', '#7a8f9d', '#9aafbd']
+    # Use a much brighter color sequence for better visibility
+    manufacturer_colors = ['#FF5E5E', '#FFD166', '#06D6A0', '#118AB2', '#E71D36', '#FF9F1C', '#2EC4B6', '#FDFFFC']
     
     fig = px.bar(
         model_counts,
@@ -134,11 +141,13 @@ def create_model_distribution_chart(model_counts):
         color_discrete_sequence=manufacturer_colors
     )
     
+    # Ensure bars are fully visible with high opacity
     fig.update_traces(
         hovertemplate='<b>%{y}</b><br>Number of Vehicles: %{x:,}',
         marker_line_color=colors['background'],
         marker_line_width=1,
-        texttemplate='%{x:,}',  # Add text labels
+        marker=dict(opacity=1.0),  # Full opacity
+        texttemplate='%{x:,}',     # Add text labels
         textposition='outside',
         textfont=dict(
             size=14,
@@ -170,25 +179,27 @@ def create_range_distribution_chart(range_df):
     """
     Create a histogram of electric range distribution
     """
-    # Use brighter colors for better visibility
-    ev_type_colors = ['#65a6a0', '#a7ccc7']
+    # Use extremely bright colors for better visibility
+    ev_type_colors = ['#FF5E5E', '#06D6A0']  # Bright red and bright mint
     
     fig = px.histogram(
         range_df,
         x='Electric Range',
         color='Electric Vehicle Type',
         nbins=30,
-        opacity=0.8,
+        opacity=1.0,  # Full opacity
         barmode='overlay',
         labels={'Electric Range': 'Electric Range (miles)'},
         title='Distribution of Electric Range',
         color_discrete_sequence=ev_type_colors
     )
     
+    # Ensure histogram bars are fully visible
     fig.update_traces(
         hovertemplate='<b>Range: %{x} miles</b><br>Count: %{y}',
         marker_line_color=colors['background'],
-        marker_line_width=1
+        marker_line_width=1,
+        marker=dict(opacity=0.9)  # High opacity but allow slight overlay
     )
     
     # Add vertical line for average range with improved visibility
@@ -241,10 +252,14 @@ def create_county_distribution_chart(county_counts):
         title='Top 15 Counties by EV Population'
     )
     
+    # Override colors to ensure visibility
     fig.update_traces(
+        marker=dict(
+            color=colors['third_color'],  # Use bright amber color
+            opacity=1.0,                  # Full opacity
+            line=dict(width=1, color=colors['background'])
+        ),
         hovertemplate='<b>%{x}</b><br>Number of Vehicles: %{y:,}',
-        marker_line_color=colors['background'],
-        marker_line_width=1,
         texttemplate='%{y:,}',  # Add text labels
         textposition='outside',
         textfont=dict(
