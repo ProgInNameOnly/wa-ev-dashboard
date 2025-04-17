@@ -1,88 +1,73 @@
 import dash
-from dash import dcc, html
+from dash import html, dcc
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
 
-# Initialize the Dash app with the custom theme
+# Initialize app
 app = dash.Dash(__name__)
+
+# Create a simple data frame
+df = pd.DataFrame({
+    'Fruit': ['Apples', 'Oranges', 'Bananas', 'Apples', 'Oranges', 'Bananas'],
+    'Amount': [4, 1, 2, 2, 4, 5],
+    'City': ['SF', 'SF', 'SF', 'NYC', 'NYC', 'NYC']
+})
+
+# Server
 server = app.server
 
-# Create some sample data
-sample_data = {'x': [1, 2, 3, 4, 5], 
-               'y': [10, 11, 12, 13, 14], 
-               'category': ['A', 'B', 'A', 'B', 'A']}
-df = pd.DataFrame(sample_data)
-
-# Create a simple figure with a bright, high-contrast color
-fig = px.bar(df, x='x', y='y', color='category', 
-             color_discrete_sequence=['#FF5E5E', '#00FFB0'])
-
-# Make sure the colors are extremely high contrast
-fig.update_traces(
-    marker=dict(
-        line=dict(width=2, color='black'),
-        opacity=1.0
-    )
-)
-
-# Set layout properties for maximum visibility
-fig.update_layout(
-    title='Simple Test Chart',
-    plot_bgcolor='#FFFFFF',
-    paper_bgcolor='#03120e',
-    font_color='#FFFFFF',
-    font=dict(size=16),
-    legend=dict(font=dict(color='#FFFFFF', size=14))
-)
-
-# Create a very simple layout with just one chart
+# App layout - extraordinarily simple
 app.layout = html.Div([
-    html.H1("Dash Test Chart", style={'color': 'white', 'textAlign': 'center'}),
+    # Title
+    html.H1('Super Simple Test Dashboard', style={'textAlign': 'center'}),
     
+    # Static hardcoded figure - should always render
     html.Div([
-        # Test Figure 1: Using the figure we created above
-        html.Div([
-            html.H3("Test Chart 1", style={'color': 'white'}),
-            dcc.Graph(
-                id='test-figure-1',
-                figure=fig
+        html.H3('Static Test Chart'),
+        dcc.Graph(
+            figure=go.Figure(
+                data=[
+                    go.Bar(
+                        x=['A', 'B', 'C'],
+                        y=[10, 20, 30],
+                        marker_color='rgb(255, 0, 0)'  # Pure red
+                    )
+                ],
+                layout=go.Layout(
+                    title='Basic Bar Chart',
+                    plot_bgcolor='white',
+                    paper_bgcolor='white'
+                )
             )
-        ], style={'marginBottom': '20px', 'padding': '15px', 'backgroundColor': '#1a1d1a'}),
-        
-        # Test Figure 2: Direct dictionary definition
-        html.Div([
-            html.H3("Test Chart 2", style={'color': 'white'}),
-            dcc.Graph(
-                id='test-figure-2',
-                figure={
-                    'data': [
-                        {
-                            'x': [1, 2, 3], 
-                            'y': [4, 1, 2], 
-                            'type': 'bar', 
-                            'name': 'Sample A',
-                            'marker': {'color': '#FF0000'}
-                        },
-                        {
-                            'x': [1, 2, 3], 
-                            'y': [2, 4, 5], 
-                            'type': 'bar', 
-                            'name': 'Sample B',
-                            'marker': {'color': '#00FF00'}
-                        }
-                    ],
-                    'layout': {
-                        'title': 'Basic Bar Chart',
-                        'plot_bgcolor': '#FFFFFF',
-                        'paper_bgcolor': '#03120e',
-                        'font': {'color': '#FFFFFF', 'size': 14}
-                    }
+        )
+    ]),
+    
+    # Spacer
+    html.Div(style={'height': '40px'}),
+    
+    # Simple Plotly Express chart
+    html.Div([
+        html.H3('Plotly Express Chart'),
+        dcc.Graph(
+            figure=px.bar(
+                df, 
+                x='Fruit', 
+                y='Amount', 
+                color='City',
+                barmode='group',
+                color_discrete_map={
+                    'SF': 'rgb(0, 0, 255)',  # Pure blue
+                    'NYC': 'rgb(255, 165, 0)'  # Pure orange
                 }
+            ).update_layout(
+                plot_bgcolor='white',
+                paper_bgcolor='white'
             )
-        ], style={'marginBottom': '20px', 'padding': '15px', 'backgroundColor': '#1a1d1a'})
-    ], style={'maxWidth': '800px', 'margin': '0 auto'}),
-], style={'backgroundColor': '#03120e', 'minHeight': '100vh', 'padding': '20px'})
+        )
+    ])
+])
 
+# Run app
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
