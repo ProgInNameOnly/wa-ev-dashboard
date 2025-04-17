@@ -27,7 +27,9 @@ colors = {
     'text': '#8ab0ab',        # cambridge-blue
     'accent': '#3e505b',      # charcoal
     'card': '#1a1d1a',        # eerie-black
-    'dark_accent': '#26413c'  # dark-slate-gray
+    'dark_accent': '#26413c', # dark-slate-gray
+    'highlight': '#65a6a0',   # brighter version of cambridge-blue
+    'bright_accent': '#5a6f7d' # brighter version of charcoal
 }
 
 # Load data
@@ -204,6 +206,30 @@ app.layout = dbc.Container([
         
         # Main content area with tabs
         dbc.Col([
+            # Test figure - hardcoded to test if figures appear at all
+            html.Div([
+                html.H4("Test Chart (Hardcoded)", style={'color': colors['highlight']}),
+                dcc.Graph(
+                    id='test-figure',
+                    figure={
+                        'data': [
+                            {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'Sample A',
+                             'marker': {'color': '#65a6a0'}},
+                            {'x': [1, 2, 3], 'y': [2, 4, 5], 'type': 'bar', 'name': 'Sample B',
+                             'marker': {'color': '#a7ccc7'}}
+                        ],
+                        'layout': {
+                            'title': 'Hardcoded Test Chart',
+                            'paper_bgcolor': colors['background'],
+                            'plot_bgcolor': colors['card'],
+                            'font': {'color': colors['highlight'], 'size': 14},
+                            'height': 300,
+                            'margin': {'l': 40, 'r': 10, 't': 40, 'b': 30},
+                        }
+                    }
+                )
+            ], style={'marginBottom': '20px', 'padding': '15px', 'backgroundColor': colors['card'], 'borderRadius': '5px'}),
+            
             dcc.Tabs(id='tabs', value='tab-1', children=[
                 # Tab 1: Overview
                 dcc.Tab(label='Overview', value='tab-1', style=tab_style, selected_style=tab_selected_style, children=[
@@ -318,6 +344,15 @@ app.layout = dbc.Container([
      Input('manufacturer-selector', 'value')]
 )
 def update_dashboard(year_range, selected_makes, selected_ev_types, selected_counties, selected_cafv, selected_mfr):
+    # Debug info
+    print("Callback triggered with filters:")
+    print(f"  Year range: {year_range}")
+    print(f"  Makes: {selected_makes}")
+    print(f"  EV types: {selected_ev_types}")
+    print(f"  Counties: {selected_counties}")
+    print(f"  CAFV: {selected_cafv}")
+    print(f"  Manufacturer: {selected_mfr}")
+    
     # Apply filters
     filtered_df = df.copy()
     
