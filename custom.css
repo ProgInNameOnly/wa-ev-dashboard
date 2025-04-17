@@ -1,0 +1,112 @@
+:root {
+  --cambridge-blue: #8ab0ab;
+  --charcoal: #3e505b;
+  --dark-slate-gray: #26413c;
+  --eerie-black: #1a1d1a;
+  --night: #03120e;
+
+  --text: var(--cambridge-blue);
+  --bg: var(--night);
+  --card: var(--eerie-black);
+  --accent: var(--charcoal);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+}
+
+/* Customize Streamlit elements */
+.stApp {
+  background-color: var(--bg);
+}
+
+/* Sidebar styling */
+.css-1d391kg, .css-1e5imcs {
+  background-color: var(--card);
+}
+
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text);
+  font-weight: bold;
+}
+
+/* Metric cards */
+.css-1xarl3l {
+  background-color: var(--card);
+  border: 1px solid var(--accent);
+  border-radius: 5px;
+  padding: 10px;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+  gap: 1em;
+}
+
+.stTabs [data-baseweb="tab"] {
+  background-color: var(--card);
+  border-radius: 4px 4px 0 0;
+  color: var(--text);
+  padding: 10px 16px;
+}
+
+.stTabs [aria-selected="true"] {
+  background-color: var(--accent);
+}
+
+/* Buttons */
+button, .stButton>button {
+  background-color: var(--accent);
+  color: var(--text);
+  border: none;
+  padding: 10px;
+}
+
+button:hover, .stButton>button:hover {
+  background-color: var(--dark-slate-gray);
+}
+
+/* Multiselect */
+.stMultiSelect [data-baseweb="tag"] {
+  background-color: var(--accent);
+}
+
+.stMultiSelect [data-baseweb="select"] {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Sliders */
+.stSlider [data-baseweb="slider"] {
+  background-color: var(--accent);
+}
+
+.stSlider [data-baseweb="thumb"] {
+  background-color: var(--text);
+}
+
+/* Select boxes */
+.stSelectbox [data-baseweb="select"] {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Selectbox dropdown menu */
+.stSelectbox div[role="listbox"] {
+  background-color: var(--card);
+  color: var(--text);
+}
+
+/* Tables */
+.stTable, table {
+  background-color: var(--card);
+  color: var(--text);
+}
+
+/* Footer */
+footer {
+  display: none;
+}
