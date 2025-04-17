@@ -21,15 +21,16 @@ app = dash.Dash(
 # Set the server port for proper deployment in Replit
 server = app.server
 
-# Custom colors for styling
+# Custom colors for styling - ULTRA BRIGHT COLORS for maximum visibility
 colors = {
-    'background': '#03120e',  # night
-    'text': '#8ab0ab',        # cambridge-blue
-    'accent': '#3e505b',      # charcoal
-    'card': '#1a1d1a',        # eerie-black
-    'dark_accent': '#26413c', # dark-slate-gray
-    'highlight': '#65a6a0',   # brighter version of cambridge-blue
-    'bright_accent': '#5a6f7d' # brighter version of charcoal
+    'background': '#03120e',     # night
+    'text': '#FFFFFF',           # WHITE for maximum contrast
+    'accent': '#FF5E5E',         # BRIGHT RED
+    'card': '#1a1d1a',           # eerie-black
+    'dark_accent': '#26413c',    # dark-slate-gray
+    'highlight': '#00FFB0',      # BRIGHT NEON GREEN
+    'bright_accent': '#FFD166',  # BRIGHT AMBER
+    'chart_color': '#FF00FF'     # BRIGHT MAGENTA 
 }
 
 # Load data
@@ -214,17 +215,21 @@ app.layout = dbc.Container([
                     figure={
                         'data': [
                             {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'Sample A',
-                             'marker': {'color': '#65a6a0'}},
+                             'marker': {'color': '#FF00FF', 'opacity': 1.0}},  # Bright magenta
                             {'x': [1, 2, 3], 'y': [2, 4, 5], 'type': 'bar', 'name': 'Sample B',
-                             'marker': {'color': '#a7ccc7'}}
+                             'marker': {'color': '#00FFFF', 'opacity': 1.0}}   # Bright cyan
                         ],
                         'layout': {
-                            'title': 'Hardcoded Test Chart',
-                            'paper_bgcolor': colors['background'],
-                            'plot_bgcolor': colors['card'],
-                            'font': {'color': colors['highlight'], 'size': 14},
+                            'title': {'text': 'BRIGHT TEST CHART', 'font': {'color': '#FFFFFF', 'size': 24}},
+                            'paper_bgcolor': '#000000',      # Pure black background
+                            'plot_bgcolor': '#000000',       # Pure black chart area
+                            'font': {'color': '#FFFFFF', 'size': 16},  # White text
                             'height': 300,
                             'margin': {'l': 40, 'r': 10, 't': 40, 'b': 30},
+                            'xaxis': {'color': '#FFFFFF', 'gridcolor': '#FFFFFF'},
+                            'yaxis': {'color': '#FFFFFF', 'gridcolor': '#FFFFFF'},
+                            'showlegend': True,
+                            'legend': {'font': {'color': '#FFFFFF', 'size': 14}}
                         }
                     }
                 )
