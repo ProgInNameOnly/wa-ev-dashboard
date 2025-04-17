@@ -17,10 +17,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Dash Dashboard"
+args = "Basic Dash"
 
 [[workflows.workflow]]
-name = "Dash Dashboard"
+name = "Basic Dash"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -31,7 +31,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python dash_app.py"
+args = "python basic_dashboard.py"
 waitForPort = 5000
 
 [[ports]]
